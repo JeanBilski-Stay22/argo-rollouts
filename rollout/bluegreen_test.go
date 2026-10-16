@@ -249,6 +249,15 @@ func TestBlueGreenProgressDeadlineAbort(t *testing.T) {
 		f.run(getKey(r2, t))
 
 		f.verifyPatchedRolloutAborted(patchIndex, "foo-"+rs2PodHash)
+
+		// A progress-deadline abort must emit a single RolloutAborted event, like any other abort
+		abortedEvents := 0
+		for _, reason := range f.events {
+			if reason == conditions.RolloutAbortedReason {
+				abortedEvents++
+			}
+		}
+		assert.Equal(t, 1, abortedEvents, "expected exactly one %s event, got events %v", conditions.RolloutAbortedReason, f.events)
 	}
 
 	for _, tc := range tests {

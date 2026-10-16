@@ -852,8 +852,9 @@ func (c *rolloutContext) evaluateProgressDeadlineAbort(newStatus *v1alpha1.Rollo
 	if c.newRS != nil {
 		msg = fmt.Sprintf(conditions.ReplicaSetTimeOutMessage, c.newRS.Name)
 	}
+	// The RolloutAborted event is emitted by calculateRolloutConditions when it sets the aborted
+	// condition, as for any other abort. Emitting it here too would send duplicate notifications.
 	c.pauseContext.AddAbort(msg)
-	c.recorder.Warnf(c.rollout, record.EventOptions{EventReason: conditions.RolloutAbortedReason}, msg)
 }
 
 func (c *rolloutContext) calculateRolloutConditions(newStatus *v1alpha1.RolloutStatus) {
